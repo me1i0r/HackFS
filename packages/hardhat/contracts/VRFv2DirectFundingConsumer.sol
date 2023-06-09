@@ -18,7 +18,8 @@ contract VRFv2DirectFundingConsumer is
         address(0xDfF835cEE7A14863BfCd264979a86d1aF2E8512C),
         address(0x6816FA2c2D1848165cCb535eF8fC695f6B8CaF10),
         address(0x2249874CA159908FEc4C71A982758446bA000ee5)];
-    uint256 public sampleSize = 3; 
+    uint256 public sampleSize = 3;
+    uint256 votingDuration;
     address[] public sample;
     uint256 public proposalCount = 0;
     
@@ -189,6 +190,10 @@ contract VRFv2DirectFundingConsumer is
     }
 
     function getAllProposals() public view returns (Proposal[] memory) {
+        return proposals;
+    }
+
+    function closeVote() public view returns (Proposal[] memory) {
         return proposals;
     }
 

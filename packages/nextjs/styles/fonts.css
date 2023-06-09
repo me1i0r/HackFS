@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'MySoul';
+    src: url('../fonts/MySoul-Regular.ttf') format('truetype'),
+         url('../fonts/MySoul-Regular.woff2') format('woff2');
+  }
+  
+@font-face {
+    font-family: 'roboto';
+    src: url('../fonts/roboto.regular.ttf') format('truetype');
+  }
+  
+  .my-soul-font {
+    font-family: 'MySoul', sans-serif;
+  }
+  
+  .roboto-font {
+    font-family: 'roboto', sans-serif;
+  }
