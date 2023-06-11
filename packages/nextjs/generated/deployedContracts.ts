@@ -5,12 +5,17 @@ const contracts = {
       chainId: "11155111",
       contracts: {
         VRFv2DirectFundingConsumer: {
-          address: "0x2FFAe8C17E54fF433D5Ea988E3fBD116145b5B90",
+          address: "0x958C507c032393CE0eBD52B90F5bce14f1Ae0A8A",
           abi: [
             {
               inputs: [],
               stateMutability: "nonpayable",
               type: "constructor",
+            },
+            {
+              inputs: [],
+              name: "OnlySimulatedBackend",
+              type: "error",
             },
             {
               anonymous: false,
@@ -102,11 +107,63 @@ const contracts = {
               type: "function",
             },
             {
+              inputs: [
+                {
+                  internalType: "bytes",
+                  name: "",
+                  type: "bytes",
+                },
+              ],
+              name: "checkUpkeep",
+              outputs: [
+                {
+                  internalType: "bool",
+                  name: "upkeepNeeded",
+                  type: "bool",
+                },
+                {
+                  internalType: "bytes",
+                  name: "performData",
+                  type: "bytes",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "id",
+                  type: "uint256",
+                },
+                {
+                  internalType: "address",
+                  name: "voter",
+                  type: "address",
+                },
+                {
+                  internalType: "uint8",
+                  name: "vote",
+                  type: "uint8",
+                },
+              ],
+              name: "countVote",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
               inputs: [],
               name: "getAllProposals",
               outputs: [
                 {
                   components: [
+                    {
+                      internalType: "uint8",
+                      name: "id",
+                      type: "uint8",
+                    },
                     {
                       internalType: "address",
                       name: "proposer",
@@ -123,9 +180,19 @@ const contracts = {
                       type: "string",
                     },
                     {
-                      internalType: "string",
+                      internalType: "uint256",
                       name: "amount",
-                      type: "string",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "reward",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "startTime",
+                      type: "uint256",
                     },
                     {
                       internalType: "string",
@@ -146,6 +213,11 @@ const contracts = {
                       internalType: "address[]",
                       name: "noVotes",
                       type: "address[]",
+                    },
+                    {
+                      internalType: "bool",
+                      name: "isPaid",
+                      type: "bool",
                     },
                   ],
                   internalType: "struct VRFv2DirectFundingConsumer.Proposal[]",
@@ -201,6 +273,11 @@ const contracts = {
             {
               inputs: [
                 {
+                  internalType: "address",
+                  name: "_proposer",
+                  type: "address",
+                },
+                {
                   internalType: "string",
                   name: "_title",
                   type: "string",
@@ -211,9 +288,9 @@ const contracts = {
                   type: "string",
                 },
                 {
-                  internalType: "string",
+                  internalType: "uint256",
                   name: "_amount",
-                  type: "string",
+                  type: "uint256",
                 },
                 {
                   internalType: "string",
@@ -272,13 +349,26 @@ const contracts = {
               type: "function",
             },
             {
+              inputs: [
+                {
+                  internalType: "bytes",
+                  name: "performData",
+                  type: "bytes",
+                },
+              ],
+              name: "performUpkeep",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
               inputs: [],
               name: "proposalCount",
               outputs: [
                 {
-                  internalType: "uint256",
+                  internalType: "uint8",
                   name: "",
-                  type: "uint256",
+                  type: "uint8",
                 },
               ],
               stateMutability: "view",
@@ -295,6 +385,11 @@ const contracts = {
               name: "proposals",
               outputs: [
                 {
+                  internalType: "uint8",
+                  name: "id",
+                  type: "uint8",
+                },
+                {
                   internalType: "address",
                   name: "proposer",
                   type: "address",
@@ -310,14 +405,29 @@ const contracts = {
                   type: "string",
                 },
                 {
-                  internalType: "string",
+                  internalType: "uint256",
                   name: "amount",
-                  type: "string",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "reward",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "startTime",
+                  type: "uint256",
                 },
                 {
                   internalType: "string",
                   name: "description",
                   type: "string",
+                },
+                {
+                  internalType: "bool",
+                  name: "isPaid",
+                  type: "bool",
                 },
               ],
               stateMutability: "view",
@@ -444,10 +554,27 @@ const contracts = {
             },
             {
               inputs: [],
+              name: "votingDuration",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [],
               name: "withdrawLink",
               outputs: [],
               stateMutability: "nonpayable",
               type: "function",
+            },
+            {
+              stateMutability: "payable",
+              type: "receive",
             },
           ],
         },

@@ -6,10 +6,12 @@ pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 import "@chainlink/contracts/src/v0.8/VRFV2WrapperConsumerBase.sol";
+import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
 
 contract VRFv2DirectFundingConsumer is
     VRFV2WrapperConsumerBase,
-    ConfirmedOwner
+    ConfirmedOwner,
+    AutomationCompatible
 {
     // Hardcoded DAO and samplesize for demonstration
     address[] public members = [
@@ -19,9 +21,10 @@ contract VRFv2DirectFundingConsumer is
         address(0x6816FA2c2D1848165cCb535eF8fC695f6B8CaF10),
         address(0x2249874CA159908FEc4C71A982758446bA000ee5)];
     uint256 public sampleSize = 3;
-    uint256 votingDuration;
     address[] public sample;
-    uint256 public proposalCount = 0;
+    uint8 public proposalCount = 0;
+    uint256 public votingDuration = 120;
+
     
     event RequestSent(uint256 requestId, uint32 numWords);
     event RequestFulfilled(
@@ -37,14 +40,18 @@ contract VRFv2DirectFundingConsumer is
     }
     
     struct Proposal {
+        uint8 id;
         address proposer;
         string title;
         string DAO;
-        string amount;
+        uint256 amount;
+        uint256 reward;
+        uint256 startTime;
         string description;
         address[] randomDelegates;  
         address[] yesVotes;
         address[] noVotes;
+        bool isPaid;
     }
     
     Proposal[] public proposals;
@@ -173,19 +180,23 @@ contract VRFv2DirectFundingConsumer is
     }   
 
     function handleSubmission(
+        address _proposer,
         string memory _title,
         string memory _DAO,
-        string memory _amount,
+        uint256 _amount,
         string memory _description
     ) public {
         Proposal memory newProposal;
+        newProposal.proposer = _proposer;
+        newProposal.id = proposalCount;
         newProposal.title = _title;
         newProposal.DAO = _DAO;
         newProposal.amount = _amount;
         newProposal.description = _description;
+        newProposal.reward = _amount / 10;
 
         proposals.push(newProposal);
-        proposalCount = proposals.length;
+        proposalCount = uint8(proposals.length);
         requestRandomWordsWrapper();
     }
 
@@ -193,9 +204,73 @@ contract VRFv2DirectFundingConsumer is
         return proposals;
     }
 
-    function closeVote() public view returns (Proposal[] memory) {
-        return proposals;
+    // Would add checks here to make sure voter is delegate and has not voted
+    function countVote(uint256 id, address voter, uint8 vote) public {
+        Proposal storage proposal = proposals[id];
+
+        if (vote == 1) {
+            proposal.yesVotes.push(voter);
+        } else {
+            proposal.noVotes.push(voter);
+        }
     }
+
+    function randomDelegatesContains(uint256 id, address voter) internal view returns (bool) {
+        Proposal storage proposal = proposals[id];
+
+        for (uint256 i = 0; i < proposal.randomDelegates.length; i++) {
+            if (proposal.randomDelegates[i] == voter) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function checkUpkeep(
+        bytes calldata /* checkData */
+    ) external view override returns (bool upkeepNeeded, bytes memory performData) {
+        upkeepNeeded = false;
+        for (uint256 i = 0; i < proposals.length; i++) {
+            if ((block.timestamp - proposals[i].startTime) > votingDuration && proposals[i].isPaid == false) {
+                upkeepNeeded = true;
+                performData = abi.encode(i);
+                break;
+            }
+        }
+    }
+
+  function performUpkeep(bytes calldata performData) external override {
+    uint256 proposalIndex = abi.decode(performData, (uint256));
+    _payout(proposalIndex);
+  }
+
+   function _payout(uint256 proposalIndex) internal {
+        Proposal storage proposal = proposals[proposalIndex];
+        require((block.timestamp - proposal.startTime) > votingDuration, "Voting period is not over yet");
+        require(!proposal.isPaid, "Proposal has already been paid out");
+
+        uint256 yesVotesCount = proposal.yesVotes.length;
+        uint256 noVotesCount = proposal.noVotes.length;
+
+        if (yesVotesCount > noVotesCount) {
+            // Transfer proposal amount to proposer
+            payable(proposal.proposer).transfer(proposal.amount);
+
+            // Distribute reward to yesVotes addresses
+            for (uint256 i = 0; i < yesVotesCount; i++) {
+                payable(proposal.yesVotes[i]).transfer(proposal.reward);
+            }
+        } else {
+            // Distribute reward to noVotes addresses
+            for (uint256 i = 0; i < noVotesCount; i++) {
+                payable(proposal.noVotes[i]).transfer(proposal.reward);
+            }
+        }
+        // Mark proposal as paid
+        proposal.isPaid = true;
+    }
+
 
     function getRequestStatus(
         uint256 _requestId
@@ -209,6 +284,9 @@ contract VRFv2DirectFundingConsumer is
         return (request.paid, request.fulfilled, request.randomWords);
     }
 
+    receive() external payable {
+
+    }
     /**
      * Allow withdraw of Link tokens from the contract
      */

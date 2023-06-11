@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
+import { BigNumber, utils } from "ethers";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
@@ -11,7 +12,7 @@ const Propose: NextPage = () => {
   const { address } = useAccount();
   const [title, setTitle] = useState("");
   const [dao, setDAO] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState<BigNumber>();
   const [proposal, setProposal] = useState("");
 
   const handleInputFocus = () => {
@@ -22,10 +23,15 @@ const Propose: NextPage = () => {
     setIsInputFocused(false);
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const etherValue = parseFloat(e.target.value);
+    const weiValue = utils.parseEther(etherValue.toString());
+    setAmount(weiValue);
+  };
   const { writeAsync } = useScaffoldContractWrite({
     contractName: "VRFv2DirectFundingConsumer",
     functionName: "handleSubmission",
-    args: [title, dao, amount, proposal],
+    args: [address, title, dao, amount, proposal],
   });
 
   const { data: allProposals } = useScaffoldContractRead({
@@ -142,8 +148,8 @@ const Propose: NextPage = () => {
                   type="text"
                   className="form-control"
                   id="amount"
-                  value={amount}
-                  onChange={e => setAmount(e.target.value)}
+                  value={amount !== undefined ? utils.formatEther(amount) : ""}
+                  onChange={handleChange}
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
                 />
@@ -168,7 +174,7 @@ const Propose: NextPage = () => {
           <div style={{ display: "flex", justifyContent: "center", paddingTop: "25px" }}>
             <button
               className="btn btn-primary bg-transparent btn-lg text-primary hover:bg-primary hover:text-white"
-              type="button"
+              type="submit"
               style={{
                 borderWidth: "3px",
                 textTransform: "none",
@@ -194,7 +200,7 @@ const Propose: NextPage = () => {
                 <p>Proposer: {proposal.proposer}</p>
                 <p>Title: {proposal.title}</p>
                 <p>DAO: {proposal.DAO}</p>
-                <p>Amount: {proposal.amount}</p>
+                <p>Amount: {amount !== undefined ? amount.toString() : ""}</p>
                 <p>Description: {proposal.description}</p>
                 <p>Random Delegates: {proposal.randomDelegates.join(", ")}</p>
                 <p>Yes Votes: {proposal.yesVotes.join(", ")}</p>
