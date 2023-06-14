@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
-import { BigNumber } from "ethers";
 import { ethers } from "ethers";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
@@ -10,15 +9,21 @@ import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 const Vote: NextPage = () => {
   const { address } = useAccount();
-  const [id, setId] = useState<BigNumber | undefined>(undefined);
+  const [id, setId] = useState<number | undefined>(undefined);
   const [voteVar, setVoteVar] = useState<number | undefined>(undefined);
+
   const { data: allProposals } = useScaffoldContractRead({
-    contractName: "VRFv2DirectFundingConsumer",
+    contractName: "DaomocracyContract",
     functionName: "getAllProposals",
   });
 
+  const [selectedProposal, setSelectedProposal] = useState<{ id: number | undefined; randomDelegates: string[] }>({
+    id: undefined,
+    randomDelegates: [],
+  });
+  
   const { writeAsync } = useScaffoldContractWrite({
-    contractName: "VRFv2DirectFundingConsumer",
+    contractName: "DaomocracyContract",
     functionName: "countVote",
     args: [id, address, voteVar],
   });
@@ -26,6 +31,15 @@ const Vote: NextPage = () => {
   const userProposals = allProposals?.filter(
     proposal => proposal.randomDelegates && address && proposal.randomDelegates.includes(address),
   );
+
+  useEffect(() => {
+    if (allProposals) {
+      allProposals.forEach(proposal => {
+        const proposalId = proposal.id;
+        console.log(`Proposal ${proposalId} Random Delegates:`, proposal.randomDelegates);
+      });
+    }
+  }, [allProposals]);
 
   return (
     <div>
@@ -71,7 +85,7 @@ const Vote: NextPage = () => {
             margin-bottom: 5px;
           }
         `}</style>
-        <title>Vote | Scaffold-ETH 2</title>
+        <title>vote | DAOmocracy</title>
       </Head>
       <div
         style={{
@@ -112,7 +126,7 @@ const Vote: NextPage = () => {
                   <div className="response">{proposal.description}</div>
                 </div>
                 <div className="button-container">
-                  <div style={{ display: "flex", justifyContent: "center", paddingTop: "25px", paddingRight: "20px" }}>
+                  <div style={{ display: "flex", justifyContent: "center", paddingTop: "40px", paddingRight: "20px" }}>
                     <button
                       className="btn btn-primary bg-transparent btn-lg text-primary hover:bg-primary hover:text-white"
                       type="button"
@@ -126,7 +140,7 @@ const Vote: NextPage = () => {
                         padding: "0 10px",
                       }}
                       onClick={() => {
-                        setId(BigNumber.from(proposal.id));
+                        setId(proposal.id);
                         setVoteVar(1);
                         writeAsync();
                       }}
@@ -134,7 +148,7 @@ const Vote: NextPage = () => {
                       approve
                     </button>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "center", paddingTop: "25px", paddingLeft: "20px" }}>
+                  <div style={{ display: "flex", justifyContent: "center", paddingTop: "40px", paddingLeft: "20px" }}>
                     <button
                       className="btn btn-primary bg-transparent btn-lg text-primary hover:bg-primary hover:text-white"
                       type="button"
@@ -147,9 +161,8 @@ const Vote: NextPage = () => {
                         borderRadius: "0",
                       }}
                       onClick={() => {
-                        setId(BigNumber.from(proposal.id));
+                        setId(proposal.id);
                         setVoteVar(0);
-                        console.log(voteVar);
                         writeAsync();
                       }}
                     >
@@ -162,6 +175,19 @@ const Vote: NextPage = () => {
           </div>
         )}
       </div>
+      {selectedProposal.id !== undefined && (
+        <div className="proposal-info">
+          <div className="label">Selected Proposal ID:</div>
+          <div className="response">{selectedProposal.id}</div>
+
+          <div className="label">Random Delegates:</div>
+          <div className="response">
+            {selectedProposal.randomDelegates.map((delegate, index) => (
+              <span key={index}>{delegate}</span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

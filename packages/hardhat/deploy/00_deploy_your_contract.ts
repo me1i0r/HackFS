@@ -5,18 +5,12 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  await deploy("VRFv2DirectFundingConsumer", {
+  await deploy("DaomocracyContract", {
     from: deployer,
-    log: true,
-  });
-
-  await deploy("YourContract", {
-    from: deployer,
-    args: [deployer],
     log: true,
   });
 };
 
 export default deployContracts;
 
-deployContracts.tags = ["VRFv2DirectFundingConsumer", "YourContract"];
+deployContracts.tags = ["DaomocracyContract"];

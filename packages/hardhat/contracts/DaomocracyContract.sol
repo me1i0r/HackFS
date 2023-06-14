@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: MIT
 // DAOmocracy demonstration contract
 // Modified from Chainlink's VRFv2DirectFundingConsumer.sol
-
 pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 import "@chainlink/contracts/src/v0.8/VRFV2WrapperConsumerBase.sol";
-import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
 
-contract VRFv2DirectFundingConsumer is
+contract DaomocracyContract is
     VRFV2WrapperConsumerBase,
-    ConfirmedOwner,
-    AutomationCompatible
+    ConfirmedOwner
 {
     // Hardcoded DAO and samplesize for demonstration
     address[] public members = [
@@ -23,9 +20,7 @@ contract VRFv2DirectFundingConsumer is
     uint256 public sampleSize = 3;
     address[] public sample;
     uint8 public proposalCount = 0;
-    uint256 public votingDuration = 120;
-
-    
+   
     event RequestSent(uint256 requestId, uint32 numWords);
     event RequestFulfilled(
         uint256 requestId,
@@ -51,7 +46,6 @@ contract VRFv2DirectFundingConsumer is
         address[] randomDelegates;  
         address[] yesVotes;
         address[] noVotes;
-        bool isPaid;
     }
     
     Proposal[] public proposals;
@@ -130,8 +124,20 @@ contract VRFv2DirectFundingConsumer is
         );
     }
 
-    function getSample(uint256[] memory randomWords) public  {
+    // Calcualte sample size with 95% confidence interval and 5% margin of error
+    function calculateSampleSize(uint256 _members) external  {
+        uint256 zValue = 196; // for 95% confidence interval (z-score of 1.96 * 100)
+        uint256 marginOfError = 5; // 5% margin of error
+        uint256 populationSize = _members;
+        uint256 p = 50; // probability of success in the population (50% for a binary choice)
+        uint256 q = 100 - p; // probability of failure in the population
+        uint256 S = (zValue * zValue * p * q) / (marginOfError * marginOfError * 10000);
+        uint256 m = 10000;
+        sampleSize = (S * m) / (m + ((S - 1) * m) / populationSize);
+    }
 
+    function getSample(uint256[] memory randomWords) public  {
+        
         // Random number between 0 and number of members - 1 for starting index
         uint256 randStart = randomWords[0] % (members.length);
 
@@ -149,6 +155,9 @@ contract VRFv2DirectFundingConsumer is
 
         // Start with a random index 
         uint256 index = randStart;
+    
+        // Calulate sample size 
+        // calculateSampleSize(members.length);
 
         // Loop until the number of addressses in the sample array equals the sample size    
         for (uint256 i = 0; i < sampleSize; i++) {
@@ -193,7 +202,6 @@ contract VRFv2DirectFundingConsumer is
         newProposal.DAO = _DAO;
         newProposal.amount = _amount;
         newProposal.description = _description;
-        newProposal.reward = _amount / 10;
 
         proposals.push(newProposal);
         proposalCount = uint8(proposals.length);
@@ -204,52 +212,10 @@ contract VRFv2DirectFundingConsumer is
         return proposals;
     }
 
-    // Would add checks here to make sure voter is delegate and has not voted
-    function countVote(uint256 id, address voter, uint8 vote) public {
-        Proposal storage proposal = proposals[id];
-
-        if (vote == 1) {
-            proposal.yesVotes.push(voter);
-        } else {
-            proposal.noVotes.push(voter);
-        }
-    }
-
-    function randomDelegatesContains(uint256 id, address voter) internal view returns (bool) {
-        Proposal storage proposal = proposals[id];
-
-        for (uint256 i = 0; i < proposal.randomDelegates.length; i++) {
-            if (proposal.randomDelegates[i] == voter) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    function checkUpkeep(
-        bytes calldata /* checkData */
-    ) external view override returns (bool upkeepNeeded, bytes memory performData) {
-        upkeepNeeded = false;
-        for (uint256 i = 0; i < proposals.length; i++) {
-            if ((block.timestamp - proposals[i].startTime) > votingDuration && proposals[i].isPaid == false) {
-                upkeepNeeded = true;
-                performData = abi.encode(i);
-                break;
-            }
-        }
-    }
-
-  function performUpkeep(bytes calldata performData) external override {
-    uint256 proposalIndex = abi.decode(performData, (uint256));
-    _payout(proposalIndex);
-  }
 
    function _payout(uint256 proposalIndex) internal {
         Proposal storage proposal = proposals[proposalIndex];
-        require((block.timestamp - proposal.startTime) > votingDuration, "Voting period is not over yet");
-        require(!proposal.isPaid, "Proposal has already been paid out");
-
+    
         uint256 yesVotesCount = proposal.yesVotes.length;
         uint256 noVotesCount = proposal.noVotes.length;
 
@@ -267,8 +233,6 @@ contract VRFv2DirectFundingConsumer is
                 payable(proposal.noVotes[i]).transfer(proposal.reward);
             }
         }
-        // Mark proposal as paid
-        proposal.isPaid = true;
     }
 
 
@@ -284,9 +248,6 @@ contract VRFv2DirectFundingConsumer is
         return (request.paid, request.fulfilled, request.randomWords);
     }
 
-    receive() external payable {
-
-    }
     /**
      * Allow withdraw of Link tokens from the contract
      */

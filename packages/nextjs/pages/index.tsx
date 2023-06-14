@@ -6,8 +6,7 @@ const Home = () => {
   return (
     <>
       <Head>
-        <title>Scaffold-ETH 2 App</title>
-        <meta name="description" content="Created with 🏗 scaffold-eth-2" />
+        <title>DAOmocracy</title>
       </Head>
 
       <div className="bg-white">
@@ -27,7 +26,7 @@ const Home = () => {
         <div className="hexagon-container">
           <div className="hexagon-group">
             <div className="yellow-hexagon-group">
-              <div className="shadow-hexagon"></div> {/* Shadow Hexagon */}
+              <div className="shadow-hexagon"></div>
               <Link href="/vote">
                 <div className="hexagon yellow-hexagon">
                   <span className="hexagon-text yellow-hexagon-text">vote</span>
@@ -58,10 +57,6 @@ const Home = () => {
       </div>
 
       <style jsx>{`
-        .bg-white {
-          background-color: #ffffff;
-        }
-
         .hexagon-container {
           display: flex;
           justify-content: center;
@@ -75,37 +70,37 @@ const Home = () => {
           position: absolute;
           top: 4px;
           left: 8px;
-          width: 300px; /* Set the same width as the main hexagons */
-          height: 275px; /* Set the same height as the main hexagons */
-          background-color: rgba(0, 0, 0, 0.1); /* Light gray color */
+          width: 300px;
+          height: 275px;
+          background-color: rgba(0, 0, 0, 0.1);
           clip-path: polygon(50% 0%, 90% 25%, 90% 75%, 50% 100%, 10% 75%, 10% 25%);
-          z-index: -1; /* Place the shadow hexagon behind the main hexagons */
+          z-index: -1;
           filter: blur(0px);
         }
 
         .hexagon-group {
-          position: relative; /* Add position relative to contain the shadow hexagon */
+          position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
 
         .yellow-hexagon-group {
-          position: relative; /* Add position relative to contain the shadow hexagon */
+          position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
 
         .blue-hexagon-group {
-          position: relative; /* Add position relative to contain the shadow hexagon */
+          position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
 
         .purple-hexagon-group {
-          position: relative; /* Add position relative to contain the shadow hexagon */
+          position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -130,10 +125,6 @@ const Home = () => {
           background-color: white;
         }
 
-        .hexagon::before:hover {
-          background-color: yellow;
-        }
-
         .hexagon-text {
           position: absolute;
           font-family: "MySoul";
@@ -143,20 +134,21 @@ const Home = () => {
           transform: translate(-50%, -50%) rotate(-15deg);
           color: #8f8f8f;
         }
+
         .hexagon:hover .hexagon-text {
           color: white;
         }
 
         .yellow-hexagon-text {
-          color: #e49f1b; /* Black color for the yellow hexagon */
+          color: #e49f1b;
         }
 
         .purple-hexagon-text {
-          color: #8d56a9; /* White color for the purple hexagon */
+          color: #8d56a9;
         }
 
         .blue-hexagon-text {
-          color: #49b691; /* White color for the blue hexagon */
+          color: #49b691;
         }
 
         .yellow-hexagon {

@@ -69,8 +69,8 @@ export const RainbowKitCustomConnectButton = () => {
                 );
               }
               return (
-                <div className="px-2 flex justify-end items-center">
-                  <div className="flex justify-center items-center border-1 rounded-lg">
+                <div className="px-2 flex justify-end items-center rounded-none">
+                  <div className="flex justify-center items-center border-1 ">
                     <div className="flex flex-col items-center mr-1">
                       <Balance address={account.address} className="min-h-0 h-auto" />
                       <span className="text-xs" style={{ color: networkColor }}>
@@ -87,7 +87,7 @@ export const RainbowKitCustomConnectButton = () => {
                         boxShadow: "3px 3px 0px rgba(0, 0, 0, 0.1)",
                         borderColor: "primary",
                       }}
-                      className="btn bg-transparent btn-lg pl-0 pr-2 shadow-md border border-primary text-primary hover:bg-primary hover:text-white"
+                      className="btn bg-transparent rounded-none btn-lg pl-0 pr-2 shadow-md border border-primary text-primary hover:border-primary hover:bg-primary hover:text-white"
                     >
                       <BlockieAvatar address={account.address} size={24} ensImage={account.ensAvatar} />
                       <span className="ml-2 mr-1">{account.displayName}</span>

@@ -76,7 +76,6 @@ module.exports = {
           warning: "#FFCF72",
           error: "#FF8863",
 
-          "--rounded-btn": "9999rem",
 
           ".tooltip": {
             "--tooltip-tail": "6px",

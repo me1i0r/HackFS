@@ -4,6 +4,501 @@ const contracts = {
       name: "sepolia",
       chainId: "11155111",
       contracts: {
+        DaomocracyContract: {
+          address: "0xB24bB8F79E933B8Db3A74cB034A1B4E7050c2FDC",
+          abi: [
+            {
+              inputs: [],
+              stateMutability: "nonpayable",
+              type: "constructor",
+            },
+            {
+              anonymous: false,
+              inputs: [
+                {
+                  indexed: true,
+                  internalType: "address",
+                  name: "from",
+                  type: "address",
+                },
+                {
+                  indexed: true,
+                  internalType: "address",
+                  name: "to",
+                  type: "address",
+                },
+              ],
+              name: "OwnershipTransferRequested",
+              type: "event",
+            },
+            {
+              anonymous: false,
+              inputs: [
+                {
+                  indexed: true,
+                  internalType: "address",
+                  name: "from",
+                  type: "address",
+                },
+                {
+                  indexed: true,
+                  internalType: "address",
+                  name: "to",
+                  type: "address",
+                },
+              ],
+              name: "OwnershipTransferred",
+              type: "event",
+            },
+            {
+              anonymous: false,
+              inputs: [
+                {
+                  indexed: false,
+                  internalType: "uint256",
+                  name: "requestId",
+                  type: "uint256",
+                },
+                {
+                  indexed: false,
+                  internalType: "uint256[]",
+                  name: "randomWords",
+                  type: "uint256[]",
+                },
+                {
+                  indexed: false,
+                  internalType: "uint256",
+                  name: "payment",
+                  type: "uint256",
+                },
+              ],
+              name: "RequestFulfilled",
+              type: "event",
+            },
+            {
+              anonymous: false,
+              inputs: [
+                {
+                  indexed: false,
+                  internalType: "uint256",
+                  name: "requestId",
+                  type: "uint256",
+                },
+                {
+                  indexed: false,
+                  internalType: "uint32",
+                  name: "numWords",
+                  type: "uint32",
+                },
+              ],
+              name: "RequestSent",
+              type: "event",
+            },
+            {
+              inputs: [],
+              name: "acceptOwnership",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "_members",
+                  type: "uint256",
+                },
+              ],
+              name: "calculateSampleSize",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "getAllProposals",
+              outputs: [
+                {
+                  components: [
+                    {
+                      internalType: "uint8",
+                      name: "id",
+                      type: "uint8",
+                    },
+                    {
+                      internalType: "address",
+                      name: "proposer",
+                      type: "address",
+                    },
+                    {
+                      internalType: "string",
+                      name: "title",
+                      type: "string",
+                    },
+                    {
+                      internalType: "string",
+                      name: "DAO",
+                      type: "string",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "amount",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "reward",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "startTime",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "string",
+                      name: "description",
+                      type: "string",
+                    },
+                    {
+                      internalType: "address[]",
+                      name: "randomDelegates",
+                      type: "address[]",
+                    },
+                    {
+                      internalType: "address[]",
+                      name: "yesVotes",
+                      type: "address[]",
+                    },
+                    {
+                      internalType: "address[]",
+                      name: "noVotes",
+                      type: "address[]",
+                    },
+                  ],
+                  internalType: "struct DaomocracyContract.Proposal[]",
+                  name: "",
+                  type: "tuple[]",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "_requestId",
+                  type: "uint256",
+                },
+              ],
+              name: "getRequestStatus",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "paid",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "fulfilled",
+                  type: "bool",
+                },
+                {
+                  internalType: "uint256[]",
+                  name: "randomWords",
+                  type: "uint256[]",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256[]",
+                  name: "randomWords",
+                  type: "uint256[]",
+                },
+              ],
+              name: "getSample",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "address",
+                  name: "_proposer",
+                  type: "address",
+                },
+                {
+                  internalType: "string",
+                  name: "_title",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "_DAO",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "_amount",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "_description",
+                  type: "string",
+                },
+              ],
+              name: "handleSubmission",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "lastRequestId",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              name: "members",
+              outputs: [
+                {
+                  internalType: "address",
+                  name: "",
+                  type: "address",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "owner",
+              outputs: [
+                {
+                  internalType: "address",
+                  name: "",
+                  type: "address",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "proposalCount",
+              outputs: [
+                {
+                  internalType: "uint8",
+                  name: "",
+                  type: "uint8",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              name: "proposals",
+              outputs: [
+                {
+                  internalType: "uint8",
+                  name: "id",
+                  type: "uint8",
+                },
+                {
+                  internalType: "address",
+                  name: "proposer",
+                  type: "address",
+                },
+                {
+                  internalType: "string",
+                  name: "title",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "DAO",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "amount",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "reward",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "startTime",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "description",
+                  type: "string",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "_requestId",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256[]",
+                  name: "_randomWords",
+                  type: "uint256[]",
+                },
+              ],
+              name: "rawFulfillRandomWords",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              name: "requestIds",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "requestRandomWords",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "requestId",
+                  type: "uint256",
+                },
+              ],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              name: "s_requests",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "paid",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "fulfilled",
+                  type: "bool",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              name: "sample",
+              outputs: [
+                {
+                  internalType: "address",
+                  name: "",
+                  type: "address",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "sampleSize",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "address",
+                  name: "to",
+                  type: "address",
+                },
+              ],
+              name: "transferOwnership",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "withdrawLink",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+          ],
+        },
         VRFv2DirectFundingConsumer: {
           address: "0x958C507c032393CE0eBD52B90F5bce14f1Ae0A8A",
           abi: [

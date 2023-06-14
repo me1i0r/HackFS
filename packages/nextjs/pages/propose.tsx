@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Head from "next/head";
 import { BigNumber, utils } from "ethers";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
-import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 const Propose: NextPage = () => {
-  const [isInputFocused, setIsInputFocused] = useState(false);
   const { address } = useAccount();
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const [title, setTitle] = useState("");
   const [dao, setDAO] = useState("");
   const [amount, setAmount] = useState<BigNumber>();
@@ -28,30 +27,17 @@ const Propose: NextPage = () => {
     const weiValue = utils.parseEther(etherValue.toString());
     setAmount(weiValue);
   };
-  const { writeAsync } = useScaffoldContractWrite({
-    contractName: "VRFv2DirectFundingConsumer",
-    functionName: "handleSubmission",
-    args: [address, title, dao, amount, proposal],
-  });
-
-  const { data: allProposals } = useScaffoldContractRead({
-    contractName: "VRFv2DirectFundingConsumer",
-    functionName: "getAllProposals",
-  });
-
-  useEffect(() => {
-    if (allProposals) {
-      const randomDelegates = allProposals
-        .map(proposal => proposal.randomDelegates)
-        .reduce((acc, delegates) => acc.concat(delegates), []);
-      console.log("Random Delegates:", randomDelegates);
-    }
-  }, [allProposals]);
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     writeAsync();
   };
+
+  const { writeAsync } = useScaffoldContractWrite({
+    contractName: "DaomocracyContract",
+    functionName: "handleSubmission",
+    args: [address, title, dao, amount, proposal],
+  });
 
   return (
     <div>
@@ -87,7 +73,7 @@ const Propose: NextPage = () => {
             border-color: #6B7280;
           }
         `}</style>
-        <title>Debug Contracts | Scaffold-ETH 2</title>
+        <title>propose | DAOmocracy</title>
       </Head>
       <div
         style={{
@@ -180,6 +166,7 @@ const Propose: NextPage = () => {
                 textTransform: "none",
                 boxShadow: "3px 3px 0px rgba(0, 0, 0, 0.1)",
                 borderColor: "#6B7280",
+                fontSize: "20px",
                 borderRadius: "0",
               }}
             >
@@ -187,44 +174,6 @@ const Propose: NextPage = () => {
             </button>
           </div>
         </form>
-      </div>
-      <div>
-        <h2>Your Address: {address}</h2>
-      </div>
-      {allProposals && (
-        <div>
-          <h2>All Proposals</h2>
-          <ul>
-            {allProposals.map((proposal, index) => (
-              <li key={index}>
-                <p>Proposer: {proposal.proposer}</p>
-                <p>Title: {proposal.title}</p>
-                <p>DAO: {proposal.DAO}</p>
-                <p>Amount: {amount !== undefined ? amount.toString() : ""}</p>
-                <p>Description: {proposal.description}</p>
-                <p>Random Delegates: {proposal.randomDelegates.join(", ")}</p>
-                <p>Yes Votes: {proposal.yesVotes.join(", ")}</p>
-                <p>No Votes: {proposal.noVotes.join(", ")}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      <div>
-        {allProposals && (
-          <div>
-            <h2>All Proposals</h2>
-            {allProposals.map((proposal, index) => (
-              <div key={index}>
-                <p>Title: {proposal.title}</p>
-                <p>Random Delegates: {proposal.randomDelegates.join(", ")}</p>
-                {address && proposal.randomDelegates.includes(address) && (
-                  <p>Your Address is in the Random Delegates list!</p>
-                )}
-              </div>
-            ))}
-          </div>
-        )}{" "}
       </div>
       <style jsx>{`
         .centered-text {
@@ -240,10 +189,6 @@ const Propose: NextPage = () => {
           font-size: 24px;
           font-weight: bold;
           text-align: center;
-        }
-
-        .form-control {
-          padding-left: 20px; /* Add some padding to accommodate the $ symbol */
         }
 
         .button-container {
