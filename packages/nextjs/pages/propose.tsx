@@ -1,18 +1,51 @@
 import React, { useState } from "react";
 import Head from "next/head";
-import { BigNumber, utils } from "ethers";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
+import seedrandom from "seedrandom";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
-import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 const Propose: NextPage = () => {
-  const { address } = useAccount();
+  const memberAddresses = [
+    "0xEDBB33d95b764103AbE1Bc1550dBC09bEE4C6F3d",
+    "0x2D2ce9676CF72505E0AeFA3dc2d3061BF84A5097",
+    "0xDfF835cEE7A14863BfCd264979a86d1aF2E8512C",
+    "0x6816FA2c2D1848165cCb535eF8fC695f6B8CaF10",
+    "0x2249874CA159908FEc4C71A982758446bA000ee5",
+  ];
+
+  const [randomAddresses, setRandomAddresses] = useState<string[]>([]);
+
+  const delegate = async () => {
+    try {
+      const chainUrl = "https://api.drand.sh";
+      const response = await fetch(`${chainUrl}/public/latest`);
+      const { randomness } = await response.json();
+
+      const seed = randomness.toString();
+      const rng = seedrandom(seed);
+
+      const selectedAddresses: string[] = [];
+      const selectedIndices = new Set<number>();
+
+      while (selectedIndices.size < 3) {
+        const randomIndex = Math.floor(rng() * memberAddresses.length);
+        selectedIndices.add(randomIndex);
+      }
+
+      selectedIndices.forEach(index => {
+        selectedAddresses.push(memberAddresses[index]);
+      });
+
+      setRandomAddresses(selectedAddresses);
+    } catch (error) {
+      console.error("Failed to fetch random number:", error);
+    }
+  };
+
+  // Call delegate() function wherever you need it
+  delegate();
+
   const [isInputFocused, setIsInputFocused] = useState(false);
-  const [title, setTitle] = useState("");
-  const [dao, setDAO] = useState("");
-  const [amount, setAmount] = useState<BigNumber>();
-  const [proposal, setProposal] = useState("");
 
   const handleInputFocus = () => {
     setIsInputFocused(true);
@@ -22,22 +55,11 @@ const Propose: NextPage = () => {
     setIsInputFocused(false);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const etherValue = parseFloat(e.target.value);
-    const weiValue = utils.parseEther(etherValue.toString());
-    setAmount(weiValue);
-  };
-
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    writeAsync();
+    delegate();
+    console.log(randomAddresses);
   };
-
-  const { writeAsync } = useScaffoldContractWrite({
-    contractName: "DaomocracyContract",
-    functionName: "handleSubmission",
-    args: [address, title, dao, amount, proposal],
-  });
 
   return (
     <div>
@@ -100,8 +122,6 @@ const Propose: NextPage = () => {
               type="text"
               className="form-control"
               id="title"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
               required
@@ -112,14 +132,7 @@ const Propose: NextPage = () => {
               <label htmlFor="exampleInputDAO" className="form-label">
                 DAO
               </label>
-              <select
-                className="form-control"
-                id="dao"
-                value={dao}
-                onChange={e => setDAO(e.target.value)}
-                onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
-              >
+              <select className="form-control" id="dao" onFocus={handleInputFocus} onBlur={handleInputBlur}>
                 <option value="">Select DAO</option>
                 <option value="demoDAO">demoDAO</option>
                 <option value="anotherDAO">anotherDAO</option>
@@ -134,8 +147,6 @@ const Propose: NextPage = () => {
                   type="text"
                   className="form-control"
                   id="amount"
-                  value={amount !== undefined ? utils.formatEther(amount) : ""}
-                  onChange={handleChange}
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
                 />
@@ -150,8 +161,6 @@ const Propose: NextPage = () => {
               className="form-control"
               id="proposal"
               rows={15}
-              value={proposal}
-              onChange={e => setProposal(e.target.value)}
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
               required
