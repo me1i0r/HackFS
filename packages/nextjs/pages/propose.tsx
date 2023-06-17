@@ -15,7 +15,6 @@ const Propose: NextPage = () => {
     "0x6816FA2c2D1848165cCb535eF8fC695f6B8CaF10",
     "0x2249874CA159908FEc4C71A982758446bA000ee5",
   ];
-  const [delegates, setDelegates] = useState<string[]>([]);
   const [title, setTitle] = useState("");
   const [DAO, setDAO] = useState("");
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -42,9 +41,9 @@ const Propose: NextPage = () => {
         selectedAddresses.push(memberAddresses[index]);
       });
 
-      await setDelegates(selectedAddresses);
-      console.log(delegates);
-      await notify(delegates);
+      console.log(selectedAddresses);
+      await notify(selectedAddresses);
+
     } catch (error) {
       console.error("Failed to fetch random number:", error);
     }
