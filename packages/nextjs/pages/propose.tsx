@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Head from "next/head";
 import type { NextPage } from "next";
 import seedrandom from "seedrandom";
+import * as PushAPI from "@pushprotocol/restapi";
+import * as ethers from "ethers";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 
 const Propose: NextPage = () => {
@@ -13,7 +15,40 @@ const Propose: NextPage = () => {
     "0x2249874CA159908FEc4C71A982758446bA000ee5",
   ];
 
-  const [randomAddresses, setRandomAddresses] = useState<string[]>([]);
+  const [delegates, setDelegates] = useState<string[]>([]);
+
+  const notify = async (addresses: string[]) => {
+    const PK = "67e1561b067d02337b50531260a80c8b11e2ecbdcc11293d6bc3422d4457fdaa"; // channel private key
+    const Pkey = `0x${PK}`;
+    const _signer = new ethers.Wallet(Pkey);
+    
+    try {
+      const formattedAddresses = addresses.map(address => `eip155:5:${address}`);
+      const apiResponse = await PushAPI.payloads.sendNotification({
+        signer: _signer,
+        type: 4,
+        identityType: 2,
+        notification: {
+          title: `[SDK-TEST] notification TITLE:`,
+          body: `[sdk-test] notification BODY`,
+        },
+        payload: {
+          title: `You have been randomly selected!`,
+          body: `sample msg body`,
+          cta: "",
+          img: "",
+        },
+        recipients: formattedAddresses,
+        channel: "eip155:5:0x616b5249Aaf1C924339f8B8E94474e64Ceb22Af3",
+        env: "staging",
+      });
+  
+      // Handle the response if needed
+      console.log("Notification sent:", apiResponse);
+    } catch (error) {
+      console.error("Failed to send notifications:", error);
+    }
+  };
 
   const delegate = async () => {
     try {
@@ -36,14 +71,13 @@ const Propose: NextPage = () => {
         selectedAddresses.push(memberAddresses[index]);
       });
 
-      setRandomAddresses(selectedAddresses);
+      setDelegates(selectedAddresses);
+      console.log(delegates);
+      await notify(delegates);
     } catch (error) {
       console.error("Failed to fetch random number:", error);
     }
   };
-
-  // Call delegate() function wherever you need it
-  delegate();
 
   const [isInputFocused, setIsInputFocused] = useState(false);
 
@@ -58,7 +92,6 @@ const Propose: NextPage = () => {
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     delegate();
-    console.log(randomAddresses);
   };
 
   return (
