@@ -43,13 +43,12 @@ const Propose: NextPage = () => {
 
       console.log(selectedAddresses);
       await notify(selectedAddresses);
-
     } catch (error) {
       console.error("Failed to fetch random number:", error);
     }
   };
 
-  // Notify delegates through Push SDK
+  // Use Push SDK to notify random delegates
   const notify = async (addresses: string[]) => {
     const PK = "67e1561b067d02337b50531260a80c8b11e2ecbdcc11293d6bc3422d4457fdaa";
     const Pkey = `0x${PK}`;
@@ -76,7 +75,6 @@ const Propose: NextPage = () => {
         env: "staging",
       });
 
-      // Handle the response if needed
       console.log("Notification sent:", apiResponse);
     } catch (error) {
       console.error("Failed to send notifications:", error);
